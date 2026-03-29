@@ -1,0 +1,25 @@
+{
+  "name": "TeamMindHub Command Center",
+  "short_name": "TeamMindHub",
+  "description": "TeamMindHub 同源知识工作台，面向文档接入、检索、分析、报告、开源集成与编排调度。",
+  "start_url": "/ui/",
+  "scope": "/ui/",
+  "display": "standalone",
+  "background_color": "#101915",
+  "theme_color": "#8ff56b",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/ui/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/ui/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

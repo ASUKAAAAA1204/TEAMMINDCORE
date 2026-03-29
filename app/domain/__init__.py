@@ -1,0 +1,2 @@
+"""Domain records for TeamMindHub."""
+

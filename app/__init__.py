@@ -1,0 +1,2 @@
+"""TeamMindHub backend package."""
+

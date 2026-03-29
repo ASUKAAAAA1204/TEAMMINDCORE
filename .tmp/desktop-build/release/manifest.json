@@ -1,0 +1,76 @@
+{
+  "app_name": "TeamMindHub",
+  "version": "0.1.0",
+  "generated_at": "2026-03-29T09:27:23.550865+00:00",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "machine": "AMD64"
+  },
+  "build": {
+    "onefile": false,
+    "windowed": true,
+    "entry_script": "D:\\programss\\p2\\app\\desktop\\main.py",
+    "bundle_path": "D:\\programss\\p2\\.tmp\\desktop-build\\dist\\TeamMindHub",
+    "frontend_index": "D:\\programss\\p2\\.tmp\\desktop-build\\bundle\\frontend\\dist\\index.html",
+    "pyinstaller_args": [
+      "--noconfirm",
+      "--name",
+      "TeamMindHub",
+      "--distpath",
+      "D:\\programss\\p2\\.tmp\\desktop-build\\dist",
+      "--workpath",
+      "D:\\programss\\p2\\.tmp\\desktop-build\\work",
+      "--specpath",
+      "D:\\programss\\p2\\.tmp\\desktop-build\\spec",
+      "--collect-submodules",
+      "webview",
+      "--collect-data",
+      "webview",
+      "--add-data",
+      "D:\\programss\\p2\\.tmp\\desktop-build\\bundle\\frontend\\dist;frontend/dist",
+      "--clean",
+      "--windowed",
+      "D:\\programss\\p2\\app\\desktop\\main.py"
+    ],
+    "ollama_presets": [
+      {
+        "key": "lightweight",
+        "label": "lightweight",
+        "model": "llama3.2:3b",
+        "description": "Lower resource usage for entry-level laptops and compact PCs.",
+        "hardware_hint": "Recommended for 8GB RAM and above"
+      },
+      {
+        "key": "standard",
+        "label": "standard",
+        "model": "deepseek-r1:8b",
+        "description": "Balanced default tier for most desktop deployments.",
+        "hardware_hint": "Recommended for 16GB RAM"
+      },
+      {
+        "key": "high_performance",
+        "label": "high_performance",
+        "model": "deepseek-r1:14b",
+        "description": "Higher quality reasoning with heavier download and runtime cost.",
+        "hardware_hint": "Recommended for 24GB RAM or more"
+      }
+    ],
+    "installer": {
+      "path": "D:\\programss\\p2\\.tmp\\desktop-build\\release\\TeamMindHub-Setup.exe",
+      "args": [
+        "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe",
+        "D:\\programss\\p2\\installer\\TeamMindHub.iss",
+        "/DMyAppName=TeamMindHub",
+        "/DMyAppVersion=0.1.0",
+        "/DMyAppExeName=TeamMindHub.exe",
+        "/DSourceDir=D:\\programss\\p2\\.tmp\\desktop-build\\dist\\TeamMindHub",
+        "/DBuildOutputDir=D:\\programss\\p2\\.tmp\\desktop-build\\release",
+        "/DBuildOutputBaseFilename=TeamMindHub-Setup",
+        "/DOllamaExecutable=C:\\Users\\33671\\AppData\\Local\\Programs\\Ollama\\ollama app.exe",
+        "/DProjectRoot=D:\\programss\\p2"
+      ],
+      "ollama_executable": "C:\\Users\\33671\\AppData\\Local\\Programs\\Ollama\\ollama app.exe"
+    }
+  }
+}

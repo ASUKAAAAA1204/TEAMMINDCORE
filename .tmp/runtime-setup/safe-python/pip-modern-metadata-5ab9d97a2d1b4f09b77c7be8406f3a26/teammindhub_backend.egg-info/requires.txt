@@ -1,0 +1,14 @@
+fastapi<1.0.0,>=0.115.0
+httpx<1.0.0,>=0.27.0
+python-multipart<1.0.0,>=0.0.9
+uvicorn[standard]<1.0.0,>=0.30.0
+
+[dev]
+pytest<9.0.0,>=8.3.0
+
+[oss]
+docling<3.0.0,>=2.0.0
+langgraph<1.0.0,>=0.2.0
+llama-index-core<1.0.0,>=0.14.0
+llama-index-retrievers-bm25<1.0.0,>=0.3.0
+ragflow-sdk<1.0.0,>=0.24.0

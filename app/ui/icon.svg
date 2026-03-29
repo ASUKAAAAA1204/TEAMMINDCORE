@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">TeamMindHub</title>
+  <desc id="desc">TeamMindHub command center application icon</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#111b16" />
+      <stop offset="100%" stop-color="#1e2d25" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#8ff56b" />
+      <stop offset="100%" stop-color="#d4ff7c" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="url(#bg)" />
+  <circle cx="394" cy="118" r="52" fill="#8ff56b" fill-opacity="0.18" />
+  <path
+    d="M104 136h304v54H288v186h-64V190H104z"
+    fill="url(#glow)"
+  />
+  <path
+    d="M122 402l62-178h62l46 94 46-94h62l62 178h-66l-26-82-42 82h-44l-42-82-26 82z"
+    fill="#f6fff0"
+  />
+</svg>

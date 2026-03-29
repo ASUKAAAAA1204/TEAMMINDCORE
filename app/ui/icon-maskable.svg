@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">TeamMindHub Maskable Icon</title>
+  <desc id="desc">Maskable TeamMindHub icon for installable web app surfaces</desc>
+  <defs>
+    <radialGradient id="maskBg" cx="20%" cy="20%" r="90%">
+      <stop offset="0%" stop-color="#1c2b22" />
+      <stop offset="100%" stop-color="#0d1410" />
+    </radialGradient>
+    <linearGradient id="accent" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#8ff56b" />
+      <stop offset="100%" stop-color="#d6ff95" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="164" fill="url(#maskBg)" />
+  <path d="M132 148h248v48H280v168h-48V196H132z" fill="url(#accent)" />
+  <path
+    d="M138 390l50-146h52l38 76 38-76h52l50 146h-56l-22-70-36 70h-28l-36-70-22 70z"
+    fill="#f8fff4"
+  />
+  <circle cx="368" cy="154" r="18" fill="#8ff56b" />
+</svg>

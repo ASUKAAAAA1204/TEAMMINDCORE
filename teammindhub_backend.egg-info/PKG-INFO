@@ -1,0 +1,319 @@
+Metadata-Version: 2.4
+Name: teammindhub-backend
+Version: 0.1.0
+Summary: Local-first FastAPI backend for TeamMindHub.
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi<1.0.0,>=0.115.0
+Requires-Dist: httpx<1.0.0,>=0.27.0
+Requires-Dist: python-multipart<1.0.0,>=0.0.9
+Requires-Dist: uvicorn[standard]<1.0.0,>=0.30.0
+Requires-Dist: pywebview<6.0.0,>=5.3.2
+Provides-Extra: dev
+Requires-Dist: pytest<9.0.0,>=8.3.0; extra == "dev"
+Provides-Extra: desktop-build
+Requires-Dist: pyinstaller<7.0.0,>=6.11.0; extra == "desktop-build"
+Provides-Extra: oss
+Requires-Dist: docling<3.0.0,>=2.0.0; extra == "oss"
+Requires-Dist: langgraph<1.0.0,>=0.2.0; extra == "oss"
+Requires-Dist: llama-index-core<1.0.0,>=0.14.0; extra == "oss"
+Requires-Dist: llama-index-retrievers-bm25<1.0.0,>=0.3.0; extra == "oss"
+Requires-Dist: ragflow-sdk<1.0.0,>=0.24.0; extra == "oss"
+
+# TeamMindHub Desktop
+
+TeamMindHub is now structured around a pure desktop runtime:
+
+- no local HTTP server in desktop mode
+- no REST hop between UI and application services
+- Python runtime and business services execute in-process
+- React frontend talks to Python through a native `pywebview` bridge
+
+The old FastAPI surface is still present as a compatibility path, but the primary product direction is desktop-first.
+
+## Desktop architecture
+
+Desktop mode is built from three layers:
+
+1. `app/runtime.py`
+   Assembles repository, parser, retrieval, report, analysis, installer, and orchestrator services without FastAPI.
+2. `app/desktop/bridge.py`
+   Exposes desktop-safe bridge methods such as `fetch_health`, `upload_documents`, `run_retrieval`, and `run_orchestrator`.
+3. `frontend/`
+   Vite/React shell that detects `window.pywebview` and calls the bridge directly instead of `fetch`.
+
+This keeps the app lighter than an Electron-style stack while preserving the same features:
+
+- document ingestion
+- retrieval
+- report generation
+- analysis
+- merge/integration
+- GitHub installer
+- orchestrator workflows
+
+## Run as desktop app
+
+### 1. Create or activate the Python environment
+
+```powershell
+cd D:\programss\p2
+py -3.12 -m venv .uvenv
+.\.uvenv\Scripts\Activate.ps1
+python -m pip install -U pip
+python -m pip install -e .
+```
+
+### 2. Launch desktop mode
+
+```powershell
+teammindhub-desktop
+```
+
+Equivalent entrypoint:
+
+```powershell
+python -m app.desktop.main
+```
+
+Desktop mode will:
+
+- create or reuse the app data directory
+- build `frontend/dist` automatically if it does not exist
+- open the UI in a native webview window
+- call Python services through the in-process bridge
+
+## Data location
+
+Desktop mode stores app state outside the repo by default.
+
+- Windows: `%LOCALAPPDATA%\TeamMindHub`
+- Linux: `$XDG_DATA_HOME/TeamMindHub` or `~/.local/share/TeamMindHub`
+
+Override it if needed:
+
+```powershell
+$env:APP_BASE_DIR = 'D:\custom\TeamMindHub'
+teammindhub-desktop
+```
+
+## Desktop-specific overrides
+
+### Reuse an already built frontend bundle
+
+If you already have a built `index.html`, point the desktop launcher at it:
+
+```powershell
+$env:TMH_DESKTOP_INDEX_PATH = 'D:\programss\p2\frontend\dist\index.html'
+teammindhub-desktop
+```
+
+This is useful for packaging or locked-down environments where `npm run build` should not run on startup.
+
+### Override the detected project root
+
+```powershell
+$env:TMH_DESKTOP_PROJECT_ROOT = 'D:\programss\p2'
+teammindhub-desktop
+```
+
+This is mainly for packaged or relocated builds.
+
+## Frontend build notes
+
+Desktop mode uses `frontend/`, not `app/ui/`.
+
+- `frontend/src/api.ts` automatically switches between:
+  - desktop bridge calls in desktop mode
+  - HTTP requests in compatibility mode
+- `frontend/vite.config.ts` uses `base: "./"` so the built app can load from `file://`
+
+If startup needs to build the frontend manually:
+
+```powershell
+cd D:\programss\p2\frontend
+npm install
+npm run build
+```
+
+## Build a distributable desktop app
+
+The desktop build path now has a dedicated packaging entrypoint based on PyInstaller.
+
+Install build tooling:
+
+```powershell
+cd D:\programss\p2
+.\.uvenv\Scripts\Activate.ps1
+python -m pip install -e .[desktop-build]
+```
+
+Build the default lightweight `onedir` package:
+
+```powershell
+teammindhub-desktop-build
+```
+
+Preview the resolved PyInstaller command without running it:
+
+```powershell
+teammindhub-desktop-build --print-command
+```
+
+Build a single-file executable instead:
+
+```powershell
+teammindhub-desktop-build --onefile
+```
+
+Build and zip the desktop release payload:
+
+```powershell
+teammindhub-desktop-build --archive
+```
+
+Build a Windows `Setup.exe` installer on top of the default `onedir` package:
+
+```powershell
+teammindhub-desktop-build --build-installer --archive
+```
+
+Equivalent PowerShell wrapper:
+
+```powershell
+.\scripts\build_installer.ps1 -Archive
+```
+
+Packaging behavior:
+
+- auto-builds or reuses the frontend bundle
+- stages `frontend/dist` into the package payload
+- collects `webview` submodules and data for PyInstaller
+- writes build artifacts under `.tmp/desktop-build/`
+- can compile a per-user Windows installer through Inno Setup 6
+- auto-detects `ISCC.exe` from common install locations
+- auto-detects Ollama from common install locations or a supplied path
+
+Current default output layout:
+
+- packaged app: `.tmp/desktop-build/dist/`
+- PyInstaller work cache: `.tmp/desktop-build/work/`
+- generated spec file: `.tmp/desktop-build/spec/`
+- release manifest: `.tmp/desktop-build/release/manifest.json`
+- optional zip archive: `.tmp/desktop-build/release/*.zip`
+- Windows installer: `.tmp/desktop-build/release/TeamMindHub-Setup.exe`
+
+### Windows installer behavior
+
+The Inno Setup installer is defined in [`installer/TeamMindHub.iss`](./installer/TeamMindHub.iss).
+
+Installer flow:
+
+- installs the packaged desktop app into `%LOCALAPPDATA%\Programs\TeamMindHub`
+- offers three Ollama presets during setup
+- writes the selected preset into `%LOCALAPPDATA%\TeamMindHub\.env.local`
+- can optionally attempt `ollama pull <model>` at the end of setup
+
+Current preset mapping:
+
+| Tier | Model | Intended hardware |
+| --- | --- | --- |
+| `lightweight` | `llama3.2:3b` | lower-memory laptops |
+| `standard` | `deepseek-r1:8b` | default balanced setup |
+| `high_performance` | `deepseek-r1:14b` | stronger desktops/workstations |
+
+Override the detected tool paths when needed:
+
+```powershell
+teammindhub-desktop-build `
+  --build-installer `
+  --iscc-path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+  --ollama-exe-path "C:\Users\33671\AppData\Local\Programs\Ollama\ollama app.exe"
+```
+
+## Diagnose the desktop environment
+
+Before packaging or runtime validation, inspect the machine state:
+
+```powershell
+teammindhub-desktop-doctor
+```
+
+JSON output is available for CI or scripted diagnostics:
+
+```powershell
+teammindhub-desktop-doctor --json
+```
+
+The doctor now reports these packaging-specific checks too:
+
+- `iscc`
+- `ollama_executable`
+
+## Compatibility HTTP mode
+
+The FastAPI server still exists for testing and compatibility:
+
+```powershell
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Useful endpoints:
+
+- `GET /health`
+- `GET /tools`
+- `POST /ingestion/upload`
+- `GET /ingestion/documents`
+- `DELETE /ingestion/{document_id}`
+- `POST /retrieval/search`
+- `POST /report/generate`
+- `POST /analysis/execute`
+- `POST /integration/merge`
+- `POST /installer/search`
+- `POST /installer/install`
+- `POST /orchestrator/run`
+
+Legacy HTTP UI:
+
+- `app/ui/` is retained as a compatibility shell
+- desktop mode does not use it
+
+## Core environment switches
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `APP_BASE_DIR` | project root in server mode, user data dir in desktop mode | Base path for SQLite, uploads, and installed tools |
+| `VECTOR_STORE_BACKEND` | `auto` | Prefer Chroma when available, fall back to local vectors |
+| `OLLAMA_BASE_URL` | `http://ollama:11434` | Ollama endpoint for planning, report, and analysis generation |
+| `OLLAMA_MODEL` | `deepseek-r1:8b` | Default local model |
+| `RAGFLOW_ENABLED` | `false` | Enable RAGFlow deep parsing |
+| `MINERU_ENABLED` | `false` | Enable external MinerU CLI parsing |
+| `LLAMAINDEX_ENABLED` | `true` | Fuse BM25 keyword retrieval into search |
+| `LANGGRAPH_ENABLED` | `true` | Enable LangGraph orchestration path |
+| `RATE_LIMIT_PER_MINUTE` | `120` | Request throttling middleware for HTTP mode |
+
+More variables are listed in [`.env.example`](./.env.example).
+
+## Validation
+
+Validated in this workspace:
+
+```powershell
+& '.\.uvenv\Scripts\python.exe' -m pytest -q --basetemp D:\programss\p2\.tmp\pytest-desktop
+cd frontend
+npx tsc -b
+```
+
+Desktop-path validation covered by tests:
+
+- runtime assembly without FastAPI
+- desktop bridge health/tools/document flow
+- retrieval/report/analysis/merge/orchestrator through the bridge
+- installer/search bridge path with isolated stubs
+- desktop asset resolution and startup override handling
+
+Environment-specific limitations still observed here:
+
+- `npm run build` may fail in this sandbox with `esbuild` `spawn EPERM`
+
+GitHub release automation template is provided in [`.github/workflows/release-desktop.yml`](./.github/workflows/release-desktop.yml). It builds the Windows installer on `windows-latest`, uploads the installer artifact, and attaches it to GitHub Releases when triggered by a published release.
