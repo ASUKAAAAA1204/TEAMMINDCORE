@@ -3,6 +3,11 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+.uvenv/
 .env.local
 data/
+.tmp/
+.npm-cache/
+node_modules/
+*.egg-info/
 !.gitkeep
