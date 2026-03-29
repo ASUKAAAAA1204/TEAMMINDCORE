@@ -1,4 +1,0 @@
-[console_scripts]
-teammindhub-desktop = app.desktop.main:main
-teammindhub-desktop-build = app.desktop.build:main
-teammindhub-desktop-doctor = app.desktop.doctor:main
